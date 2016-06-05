@@ -53,7 +53,7 @@ namespace Shop
             {
                 _internalStorage[index] = default(T);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine($"The chosen index: {index} was out of bounds");
             }
