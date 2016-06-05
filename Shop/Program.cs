@@ -6,23 +6,23 @@ namespace Shop
     {
         private static void Main(string[] args)
         {
-            var testCart = new ShoppingCart<string>();
+            var testCart = new ShoppingCart<Item>();
 
-            testCart.Add("Hej");
-            testCart.Add("Naab");
-            testCart.Add("Jag");
-            testCart.Add("Gör");
+            var item = new Item("Skärm", 2000, "LED-skärm från BenQ");
+            testCart.Add(item);
 
-            testCart.Remove(2);
-            testCart.Remove("Hej");
-            testCart.Remove(6);
-            testCart.Add("En");
+            item = new Item("Skärm", 2000, "LED-skärm från BenQ");
+            testCart.Add(item);
+
+            testCart.Remove(0);
 
             foreach (var cartItem in testCart)
             {
-                Console.WriteLine(cartItem);
+                Console.WriteLine(cartItem.Name);
+                Console.WriteLine(cartItem.Description);
+                Console.WriteLine(cartItem.Price);
+                Console.WriteLine("---");
             }
-
 
             Console.ReadLine();
         }

@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Shop
 {
     internal class ShoppingCart<T> : IEnumerable<T>
+        where T : Item
     {
         private int _firstOpenSlot;
         private T[] _internalStorage;
@@ -21,11 +23,11 @@ namespace Shop
             if (_internalStorage.Length - 1 == _firstOpenSlot)
             {
                 _internalStorage[_firstOpenSlot] = t;
-                SetNextFirstOpenSlot();
+                _firstOpenSlot = GetNextEmptySlotIndex();
             }
             else
             {
-                Console.WriteLine("Fanns ingen ledig plats");
+                Debug.WriteLine($"There was no empty spot in: {_firstOpenSlot}");
                 IncreaseInternalStorageByOne();
                 _internalStorage[_firstOpenSlot] = t;
                 _firstOpenSlot = _internalStorage.Length;
@@ -42,7 +44,7 @@ namespace Shop
                     break;
                 }
             }
-            SetNextFirstOpenSlot();
+            _firstOpenSlot = GetNextEmptySlotIndex();
         }
 
         public void Remove(int index)
@@ -55,21 +57,50 @@ namespace Shop
             {
                 Debug.WriteLine($"The chosen index: {index} was out of bounds");
             }
-            SetNextFirstOpenSlot();
+            _firstOpenSlot = GetNextEmptySlotIndex();
         }
 
-        private void SetNextFirstOpenSlot()
+        public double CalculatePrice()
         {
-            var nextOpenSlot = GetNextEmptySlotIndex();
+            return _internalStorage.Sum(t => t.Price);
+        }
 
-            if (nextOpenSlot == -1)
+        public T GetMostExpensiveItem()
+        {
+            var mostExpensiveItem = _internalStorage[0];
+
+            foreach (var t in _internalStorage)
             {
-                IncreaseInternalStorageByOne();
+                if (t.Price > mostExpensiveItem.Price)
+                {
+                    mostExpensiveItem = t;
+                }
             }
-            else
+
+            return mostExpensiveItem;
+        }
+
+        public void Clear()
+        {
+            for (var index = 0; index < _internalStorage.Length; index++)
             {
-                _firstOpenSlot = nextOpenSlot;
+                _internalStorage[index] = default(T);
             }
+        }
+
+        public T[] SortPriceAscending()
+        {
+            return _internalStorage.OrderBy(x => x.Price).ToArray();
+        }
+
+        public T[] SortPriceDescending()
+        {
+            return _internalStorage.OrderByDescending(x => x.Price).ToArray();
+        }
+
+        public T[] GetUniqueItems()
+        {
+            return _internalStorage.Distinct().ToArray();
         }
 
         private void IncreaseInternalStorageByOne()
@@ -95,9 +126,9 @@ namespace Shop
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int index = 0; index < _internalStorage.Length; index++)
+            foreach (var t in _internalStorage)
             {
-                yield return _internalStorage[index];
+                yield return t;
             }
         }
 
