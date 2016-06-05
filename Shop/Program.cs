@@ -1,21 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop
 {
-    class Program
+    public static class Program
     {
         private static void Main(string[] args)
         {
-            ShoppingCart<int> testCart = new ShoppingCart<int>();
+            var testCart = new ShoppingCart<string>();
 
-            testCart.Add(1);
-            testCart.Add(2);
-            testCart.Add(3);
-            testCart.Add(4);
+            testCart.Add("Hej");
+            testCart.Add("Naab");
+            testCart.Add("Jag");
+            testCart.Add("Gör");
+
+            testCart.Remove(2);
+            testCart.Remove("Hej");
+            testCart.Remove(6);
+            testCart.Add("En");
+
+            foreach (var cartItem in testCart)
+            {
+                Console.WriteLine(cartItem);
+            }
+
+
             Console.ReadLine();
         }
     }

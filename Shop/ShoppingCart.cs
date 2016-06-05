@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Shop
 {
-    internal class ShoppingCart<T>
+    internal class ShoppingCart<T> : IEnumerable<T>
     {
         private int _firstOpenSlot;
         private T[] _internalStorage;
@@ -27,13 +30,32 @@ namespace Shop
                 _internalStorage[_firstOpenSlot] = t;
                 _firstOpenSlot = _internalStorage.Length;
             }
+        }
 
-
-            // Testa skiten
-            foreach (var stuff in _internalStorage)
+        public void Remove(T t)
+        {
+            for (var i = 0; i < _internalStorage.Length; i++)
             {
-                Console.WriteLine(stuff.ToString());
+                if (_internalStorage[i].Equals(t))
+                {
+                    _internalStorage[i] = default(T);
+                    break;
+                }
             }
+            SetNextFirstOpenSlot();
+        }
+
+        public void Remove(int index)
+        {
+            try
+            {
+                _internalStorage[index] = default(T);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"The chosen index: {index} was out of bounds");
+            }
+            SetNextFirstOpenSlot();
         }
 
         private void SetNextFirstOpenSlot()
@@ -62,13 +84,26 @@ namespace Shop
         {
             for (var i = 0; i < _internalStorage.Length - 1; i++)
             {
-                if (_internalStorage[i] == null)
+                if (EqualityComparer<T>.Default.Equals(_internalStorage[i], default(T)))
                 {
                     return i;
                 }
             }
 
             return -1;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (int index = 0; index < _internalStorage.Length; index++)
+            {
+                yield return _internalStorage[index];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }
