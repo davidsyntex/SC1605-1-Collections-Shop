@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Shop
@@ -7,11 +8,11 @@ namespace Shop
     internal class ShoppingCartList<T> : IEnumerable<T>
         where T : Item
     {
-        private readonly List<T> _internalStorage;
+        private readonly Collection<T> _internalStorage;
 
         public ShoppingCartList()
         {
-            _internalStorage = new List<T>();
+            _internalStorage = new Collection<T>();
         }
 
         public void Add(T t)

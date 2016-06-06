@@ -18,6 +18,19 @@ namespace Shop
             _firstOpenSlot = 0;
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (var t in _internalStorage)
+            {
+                yield return t;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         public void Add(T t)
         {
             if (_internalStorage.Length - 1 == _firstOpenSlot)
@@ -32,19 +45,33 @@ namespace Shop
                 _internalStorage[_firstOpenSlot] = t;
                 _firstOpenSlot = _internalStorage.Length;
             }
+            Debug.WriteLine($"First Open Slot is: {_firstOpenSlot}");
+        }
+
+        private void DebugSize()
+        {
+            Debug.WriteLine(_internalStorage.Length);
+            foreach (var t1 in _internalStorage)
+            {
+                if (t1 == null)
+                {
+                    continue;
+                }
+                Debug.WriteLine(t1.ToString());
+            }
         }
 
         public void Remove(T t)
         {
             for (var i = 0; i < _internalStorage.Length; i++)
             {
-                if (_internalStorage[i].Equals(t))
-                {
-                    _internalStorage[i] = default(T);
-                    break;
-                }
+                if (_internalStorage[i] == null) continue;
+                if (!_internalStorage[i].Equals(t)) continue;
+                _internalStorage[i] = default(T);
+                break;
             }
             _firstOpenSlot = GetNextEmptySlotIndex();
+            DebugSize();
         }
 
         public void Remove(int index)
@@ -58,21 +85,30 @@ namespace Shop
                 Debug.WriteLine($"The chosen index: {index} was out of bounds");
             }
             _firstOpenSlot = GetNextEmptySlotIndex();
+            DebugSize();
         }
 
         public double CalculatePrice()
         {
-            return _internalStorage.Sum(t => t.Price);
+            var sum = 0.0;
+            foreach (var t in _internalStorage)
+            {
+                if (t == null) continue;
+                sum += t.Price;
+            }
+            return sum;
         }
 
         public T GetMostExpensiveItem()
         {
-            var mostExpensiveItem = _internalStorage[0];
+            T mostExpensiveItem = null;
+            var mostExpensivePrice = 0.0;
 
             foreach (var t in _internalStorage)
             {
-                if (t.Price > mostExpensiveItem.Price)
+                if (t?.Price > mostExpensivePrice)
                 {
+                    mostExpensivePrice = t.Price;
                     mostExpensiveItem = t;
                 }
             }
@@ -90,17 +126,17 @@ namespace Shop
 
         public T[] SortPriceAscending()
         {
-            return _internalStorage.OrderBy(x => x.Price).ToArray();
+            return _internalStorage.Where(x => x != null).OrderBy(x => x.Price).ToArray();
         }
 
         public T[] SortPriceDescending()
         {
-            return _internalStorage.OrderByDescending(x => x.Price).ToArray();
+            return _internalStorage.Where(x => x != null).OrderByDescending(x => x.Price).ToArray();
         }
 
         public T[] GetUniqueItems()
         {
-            return _internalStorage.Distinct().ToArray();
+            return _internalStorage.Where(x => x != null).Distinct().ToArray();
         }
 
         private void IncreaseInternalStorageByOne()
@@ -122,19 +158,6 @@ namespace Shop
             }
 
             return -1;
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            foreach (var t in _internalStorage)
-            {
-                yield return t;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
         }
     }
 }
